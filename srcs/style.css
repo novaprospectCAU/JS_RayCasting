@@ -1,0 +1,70 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 1200px;
+  width: 1200px;
+  max-width: 1200px;
+}
+
+body .title {
+  background-color: grey;
+  font-weight: 800;
+  border-width: 5px;
+  border-color: lightgrey;
+  border-style: solid;
+}
+
+body .game {
+  background-color: aliceblue;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: 1;
+  justify-content: center;
+}
+
+body .game .left-side {
+  background-color: antiquewhite;
+  text-align: center;
+  width: 50%;
+  height: 480px;
+  min-width: 480px;
+  min-height: 320px;
+}
+
+body .game .left-side #minimap {
+  background-color: black;
+  width: 90%;
+  height: 80%;
+  border-width: 5px;
+  border-color: lightgrey;
+  border-style: solid;
+}
+
+body .game .right-side {
+  background-color: beige;
+  text-align: center;
+  width: 50%;
+  height: 480px;
+  min-width: 480px;
+  min-height: 320px;
+}
+
+body .game .right-side #gameplay {
+  background-color: black;
+  width: 90%;
+  height: 80%;
+  border-width: 5px;
+  border-color: lightgrey;
+  border-style: solid;
+}
+
+body .input {
+  background-color: bisque;
+  height: 180px;
+  border-width: 10px;
+  border-color: lightgrey;
+  border-style: solid;
+}
