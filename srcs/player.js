@@ -83,7 +83,9 @@ function rayCollide(angle) {}
 function rayCollideVertical() {
   const numberOfBlocks = Math.floor(C1WIDTH / BLOCK_SIZE);
   const playerBlock = Math.floor(playerX / BLOCK_SIZE);
-  for (let i = playerBlock + 1; i < numberOfBlocks; i++) {}
+  for (let i = playerBlock + 1; i < numberOfBlocks; i++) {
+    
+  }
 }
 
 function rayCollideHorizontal() {
