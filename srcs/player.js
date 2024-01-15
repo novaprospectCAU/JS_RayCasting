@@ -16,7 +16,7 @@ const PI = Math.PI.toFixed(8);
 export let playerX = 0;
 export let playerY = 0;
 
-export let playerAngle = (PI * 2) / 3;
+export let playerAngle = PI * -0.2;
 
 export function playerInit() {
   playerX = Math.floor(C1WIDTH / 2) + Math.floor(BLOCK_SIZE / 2);
