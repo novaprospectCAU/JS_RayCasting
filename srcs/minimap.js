@@ -17,7 +17,9 @@ export function minimapInit() {
   const w = Math.floor(C1WIDTH / BLOCK_SIZE);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
-      if (y === Math.floor(h / 2) || x === Math.floor(w / 2)) {
+      if (y === 0 || y === h - 1 || x == 0 || x == w - 1) {
+        map[y * w + x] = 0;
+      } else if (y === Math.floor(h / 2) || x === Math.floor(w / 2)) {
         map[y * w + x] = 1;
       } else {
         map[y * w + x] = Math.floor(Math.random() + 0.5);
