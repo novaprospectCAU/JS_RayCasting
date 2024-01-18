@@ -1,4 +1,5 @@
 import {
+  leftCanvas,
   minimap,
   C1WIDTH,
   C1HEIGHT,
@@ -16,7 +17,7 @@ const PI = Math.PI.toFixed(8);
 export let playerX = 0;
 export let playerY = 0;
 
-export let playerAngle = PI * -0.2;
+export let playerAngle = PI * 0.5;
 
 export let moveRight = false;
 export let moveLeft = false;
@@ -43,6 +44,7 @@ export function laserDraw() {
   const obj = quadrantCalculate(playerAngle);
   const laserX = obj.X;
   const laserY = obj.Y;
+
   minimap.strokeStyle = "red";
   minimap.beginPath();
   minimap.moveTo(laserStartX, laserStartY);
@@ -60,12 +62,17 @@ export function lightDraw() {
 
   const HALF_SIGHT = (PI / 6).toFixed(8);
   //temp code
-  const laserLength = 80;
+  const laserLength = leftCanvas.width * leftCanvas.height; //DEFAULT_VALUE
 
   for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.05) {
     const obj = quadrantCalculate(playerAngle + rayAngle);
     const rayX = obj.X;
     const rayY = obj.Y;
+
+    // const obj = rayCollide(playerAngle + rayAngle);
+    // const rayX = obj.x;
+    // const rayY = obj.y;
+
     minimap.strokeStyle = "green";
     minimap.beginPath();
     minimap.moveTo(lightStartX, lightStartY);
@@ -73,35 +80,65 @@ export function lightDraw() {
       lightStartX + laserLength * rayX,
       lightStartY + laserLength * rayY
     );
+    // minimap.lineTo(rayX, rayY);
     minimap.closePath();
     minimap.stroke();
   }
 }
 
-function rayCollide(angle) {}
-
-function rayCollideVertical() {
-  const numberOfBlocks = Math.floor(C1WIDTH / BLOCK_SIZE);
-  const playerBlock = Math.floor(playerX / BLOCK_SIZE);
-  for (let i = playerBlock + 1; i < numberOfBlocks; i++) {
-    
+function rayCollide(angle) {
+  while (angle < 0) {
+    angle += 2 * PI;
   }
+  while (angle > 2 * PI) {
+    angle %= 2 * PI;
+  }
+  if (angle === 2 * PI) {
+    angle = 0;
+  }
+  const objVert = rayCollideVertical(angle);
+  // const objHori = rayCollideHorizontal(angle);
+  // const obj = objVert.length > objHori.length ? objHori : objVert;
+  return objVert;
 }
 
-function rayCollideHorizontal() {
-  const numberOfBlocks = Math.floor(C1HEIGHT / BLOCK_SIZE);
+function rayCollideVertical(angle) {
+  //X = (Y - py) / m + px
+}
+
+function rayCollideHorizontal(angle) {
+  //Y = m(X - pX) + pY
+  const m = Math.tan(angle);
+  if (angle >= 0 && angle < PI / 2) {
+  } else if (angle < PI) {
+  } else if (angle < (PI / 2) * 3) {
+  } else {
+  }
 }
 
 //입력만 받고 실제 움직임은 아직 구현하지 않았음
 document.addEventListener("keydown", (e) => {
+  let xMove = 0;
+  let yMove = 0;
+
   if (e.key === 37 || e.key === "ArrowRight") {
     moveRight = true;
+    playerAngle -= PI / 60;
   } else if (e.key === 38 || e.key === "ArrowUp") {
     moveUp = true;
+    xMove = Math.cos(playerAngle) * 2;
+    yMove = -Math.sin(playerAngle) * 2;
+    playerX += xMove;
+    playerY += yMove;
   } else if (e.key === 39 || e.key === "ArrowLeft") {
     moveLeft = true;
+    playerAngle += PI / 60;
   } else if (e.key === 40 || e.key === "ArrowDown") {
     moveDown = true;
+    xMove = Math.cos(playerAngle - PI) * 2;
+    yMove = -Math.sin(playerAngle - PI) * 2;
+    playerX += xMove;
+    playerY += yMove;
   } else {
   }
 });

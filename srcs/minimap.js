@@ -7,9 +7,9 @@ export const C1WIDTH = leftCanvas.width;
 export const C1HEIGHT = leftCanvas.height;
 
 export let map = [];
-export let mapWidth = 0;
-export let mapHeight = 0;
-export const BLOCK_SIZE = 30;
+export let mapWidth = 0; //가로 칸 수
+export let mapHeight = 0; //세로 칸 수
+export const BLOCK_SIZE = 30; //한칸의 길이
 
 export function minimapInit() {
   const h = Math.floor(C1HEIGHT / BLOCK_SIZE);

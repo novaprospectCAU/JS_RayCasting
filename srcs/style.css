@@ -4,6 +4,8 @@ body {
   min-width: 1400px;
   width: 1400px;
   max-width: 1400px;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 body .title {
