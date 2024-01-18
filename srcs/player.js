@@ -4,8 +4,8 @@ import {
   C1WIDTH,
   C1HEIGHT,
   map,
-  mapWidth,
-  mapHeight,
+  mapHorizontalBlocks,
+  mapVerticalBlocks,
   BLOCK_SIZE,
 } from "./minimap.js";
 
@@ -96,34 +96,48 @@ function rayCollide(angle) {
   if (angle === 2 * PI) {
     angle = 0;
   }
-  const objVert = rayCollideVertical(angle);
+  let m = Math.tan(angle);
+  if (m > 0) {
+    if (m < 0.001) {
+      m = 0.001;
+      playerAngle = 0.001;
+    } else if (m > 1000) {
+      m = 1000;
+      playerAngle = 1.56979633;
+    }
+  } else if (m < 0) {
+    if (m > -0.001) {
+      m = -0.001;
+      playerAngle = -0.001;
+    } else if (m < -1000) {
+      m = -1000;
+      playerAngle = -1.56979633;
+    }
+  }
+  const objVert = rayCollideVertical(angle, m);
   // const objHori = rayCollideHorizontal(angle);
   // const obj = objVert.length > objHori.length ? objHori : objVert;
   return objVert;
 }
 
-function rayCollideVertical(angle) {
+function rayCollideVertical(angle, m) {
   //X = (Y - py) / m + px
+  // if (angle >= 0 && angle < PI / 2) {
+  // } else if (angle < )
 }
 
-function rayCollideHorizontal(angle) {
+function rayCollideHorizontal(angle, m) {
   //Y = m(X - pX) + pY
-  const m = Math.tan(angle);
-  if (angle >= 0 && angle < PI / 2) {
-  } else if (angle < PI) {
-  } else if (angle < (PI / 2) * 3) {
-  } else {
-  }
 }
 
-//입력만 받고 실제 움직임은 아직 구현하지 않았음
+//입력받고 이동까지는 구현했으나 충돌은 구현하지 않았음
 document.addEventListener("keydown", (e) => {
   let xMove = 0;
   let yMove = 0;
 
   if (e.key === 37 || e.key === "ArrowRight") {
     moveRight = true;
-    playerAngle -= PI / 60;
+    playerAngle -= PI / 30;
   } else if (e.key === 38 || e.key === "ArrowUp") {
     moveUp = true;
     xMove = Math.cos(playerAngle) * 2;
@@ -132,7 +146,7 @@ document.addEventListener("keydown", (e) => {
     playerY += yMove;
   } else if (e.key === 39 || e.key === "ArrowLeft") {
     moveLeft = true;
-    playerAngle += PI / 60;
+    playerAngle += PI / 30;
   } else if (e.key === 40 || e.key === "ArrowDown") {
     moveDown = true;
     xMove = Math.cos(playerAngle - PI) * 2;
