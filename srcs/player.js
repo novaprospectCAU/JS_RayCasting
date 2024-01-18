@@ -113,9 +113,9 @@ function rayCollide(angle) {
   //because of Y-axis's direction, m should muliplied by -1
   m = -m;
   const objVert = rayCollideVertical(angle, m);
-  // const objHori = rayCollideHorizontal(angle);
-  // const obj = objVert.length > objHori.length ? objHori : objVert;
-  return objVert;
+  const objHori = rayCollideHorizontal(angle, m);
+  const obj = objVert.length > objHori.length ? objHori : objVert;
+  return obj;
 }
 
 function rayCollideVertical(angle, m) {
@@ -130,14 +130,14 @@ function rayCollideVertical(angle, m) {
       X = (yCollideHeight - playerY) / m + playerX;
       if (
         map[
-          (Math.round(yCollideHeight / BLOCK_SIZE) - 1) * mapHorizontalBlocks +
+          (Math.floor(yCollideHeight / BLOCK_SIZE) - 1) * mapHorizontalBlocks +
             Math.floor(X / BLOCK_SIZE)
         ] === 0
       ) {
         return {
           x: X,
           y: yCollideHeight,
-          length: hypotenuseCalculate(X - playerX, 0 - playerY),
+          length: hypotenuseCalculate(X - playerX, yCollideHeight - playerY),
         };
       }
     }
@@ -230,6 +230,167 @@ function rayCollideVertical(angle, m) {
 
 function rayCollideHorizontal(angle, m) {
   //Y = m(X - pX) + pY
+  let Y = 0;
+  //we have to handle the case when the m is 0.
+  if (angle === 0) {
+    for (
+      let xCollideWidth = Math.ceil(playerX / BLOCK_SIZE) * BLOCK_SIZE;
+      xCollideWidth < C1WIDTH;
+      xCollideWidth += BLOCK_SIZE
+    ) {
+      Y = playerY;
+      if (
+        map[
+          Math.floor(Y / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.ceil(xCollideWidth / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: xCollideWidth,
+          y: Y,
+          length: xCollideWidth - playerX,
+        };
+      }
+    }
+    return {
+      x: C1WIDTH,
+      y: playerY,
+      length: C1WIDTH - playerX,
+    };
+  }
+  if (angle === PI) {
+    for (
+      let xCollideWidth = Math.floor(playerX / BLOCK_SIZE) * BLOCK_SIZE;
+      xCollideWidth > 0;
+      xCollideWidth -= BLOCK_SIZE
+    ) {
+      Y = playerY;
+      if (
+        map[
+          Math.floor(Y / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.floor(xCollideWidth / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: xCollideWidth,
+          y: Y,
+          length: playerX - xCollideWidth,
+        };
+      }
+    }
+    return {
+      x: 0,
+      y: playerY,
+      length: playerX,
+    };
+  }
+  if (angle > 0 && angle < PI / 2) {
+    for (
+      let xCollideWidth = Math.ceil(playerX / BLOCK_SIZE) * BLOCK_SIZE;
+      xCollideWidth < C1WIDTH;
+      xCollideWidth += BLOCK_SIZE
+    ) {
+      Y = m * (xCollideWidth - playerX) + playerY;
+      if (
+        map[
+          Math.floor(Y / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.ceil(xCollideWidth / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: xCollideWidth,
+          y: Y,
+          length: hypotenuseCalculate(xCollideWidth - playerX, Y - playerY),
+        };
+      }
+    }
+    Y = m * (C1WIDTH - playerX) + playerY;
+    return {
+      x: C1WIDTH,
+      y: Y,
+      length: hypotenuseCalculate(C1WIDTH - playerX, Y - playerY),
+    };
+  } else if (angle < PI) {
+    for (
+      let xCollideWidth = Math.floor(playerX / BLOCK_SIZE) * BLOCK_SIZE;
+      xCollideWidth > 0;
+      xCollideWidth -= BLOCK_SIZE
+    ) {
+      Y = m * (xCollideWidth - playerX) + playerY;
+      if (
+        map[
+          Math.floor(Y / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.floor(xCollideWidth / BLOCK_SIZE) -
+            1
+        ] === 0
+      ) {
+        return {
+          x: xCollideWidth,
+          y: Y,
+          length: hypotenuseCalculate(xCollideWidth - playerX, Y - playerY),
+        };
+      }
+    }
+    Y = m * (0 - playerX) + playerY;
+    return {
+      x: 0,
+      y: Y,
+      length: hypotenuseCalculate(0 - playerX, Y - playerY),
+    };
+  } else if (angle < (PI * 3) / 2) {
+    for (
+      let xCollideWidth = Math.floor(playerX / BLOCK_SIZE) * BLOCK_SIZE;
+      xCollideWidth > 0;
+      xCollideWidth -= BLOCK_SIZE
+    ) {
+      Y = m * (xCollideWidth - playerX) + playerY;
+      if (
+        map[
+          Math.floor(Y / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.floor(xCollideWidth / BLOCK_SIZE) -
+            1
+        ] === 0
+      ) {
+        return {
+          x: xCollideWidth,
+          y: Y,
+          length: hypotenuseCalculate(xCollideWidth - playerX, Y - playerY),
+        };
+      }
+    }
+    Y = m * (0 - playerX) + playerY;
+    return {
+      x: 0,
+      y: Y,
+      length: hypotenuseCalculate(0 - playerX, Y - playerY),
+    };
+  } else {
+    for (
+      let xCollideWidth = Math.ceil(playerX / BLOCK_SIZE) * BLOCK_SIZE;
+      xCollideWidth < C1WIDTH;
+      xCollideWidth += BLOCK_SIZE
+    ) {
+      Y = m * (xCollideWidth - playerX) + playerY;
+      if (
+        map[
+          Math.floor(Y / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.ceil(xCollideWidth / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: xCollideWidth,
+          y: Y,
+          length: hypotenuseCalculate(xCollideWidth - playerX, Y - playerY),
+        };
+      }
+    }
+    Y = m * (C1WIDTH - playerX) + playerY;
+    return {
+      x: C1WIDTH,
+      y: Y,
+      length: hypotenuseCalculate(C1WIDTH - playerX, Y - playerY),
+    };
+  }
 }
 
 //입력받고 이동까지는 구현했으나 충돌은 구현하지 않았음
