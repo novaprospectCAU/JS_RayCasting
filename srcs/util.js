@@ -31,3 +31,8 @@ function quadrant3VectorCalculate(angle) {
 function quadrant4VectorCalculate(angle) {
   return { X: Math.cos(angle), Y: -Math.sin(angle) };
 }
+
+//Calculate the length of ray (hypotenuse of triangle)
+export function hypotenuseCalculate(x, y) {
+  return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+}

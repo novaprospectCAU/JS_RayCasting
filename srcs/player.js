@@ -9,7 +9,7 @@ import {
   BLOCK_SIZE,
 } from "./minimap.js";
 
-import { quadrantCalculate } from "./util.js";
+import { quadrantCalculate, hypotenuseCalculate } from "./util.js";
 
 const PI = Math.PI.toFixed(8);
 
@@ -62,25 +62,25 @@ export function lightDraw() {
 
   const HALF_SIGHT = (PI / 6).toFixed(8);
   //temp code
-  const laserLength = leftCanvas.width * leftCanvas.height; //DEFAULT_VALUE
+  // const laserLength = leftCanvas.width * leftCanvas.height; //DEFAULT_VALUE
 
   for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.05) {
-    const obj = quadrantCalculate(playerAngle + rayAngle);
-    const rayX = obj.X;
-    const rayY = obj.Y;
+    // const obj = quadrantCalculate(playerAngle + rayAngle);
+    // const rayX = obj.X;
+    // const rayY = obj.Y;
 
-    // const obj = rayCollide(playerAngle + rayAngle);
-    // const rayX = obj.x;
-    // const rayY = obj.y;
+    const obj = rayCollide(playerAngle + rayAngle);
+    const rayX = obj.x;
+    const rayY = obj.y;
 
     minimap.strokeStyle = "green";
     minimap.beginPath();
     minimap.moveTo(lightStartX, lightStartY);
-    minimap.lineTo(
-      lightStartX + laserLength * rayX,
-      lightStartY + laserLength * rayY
-    );
-    // minimap.lineTo(rayX, rayY);
+    // minimap.lineTo(
+    //   lightStartX + laserLength * rayX,
+    //   lightStartY + laserLength * rayY
+    // );
+    minimap.lineTo(rayX, rayY);
     minimap.closePath();
     minimap.stroke();
   }
@@ -100,20 +100,18 @@ function rayCollide(angle) {
   if (m > 0) {
     if (m < 0.001) {
       m = 0.001;
-      playerAngle = 0.001;
     } else if (m > 1000) {
       m = 1000;
-      playerAngle = 1.56979633;
     }
   } else if (m < 0) {
     if (m > -0.001) {
       m = -0.001;
-      playerAngle = -0.001;
     } else if (m < -1000) {
       m = -1000;
-      playerAngle = -1.56979633;
     }
   }
+  //because of Y-axis's direction, m should muliplied by -1
+  m = -m;
   const objVert = rayCollideVertical(angle, m);
   // const objHori = rayCollideHorizontal(angle);
   // const obj = objVert.length > objHori.length ? objHori : objVert;
@@ -122,8 +120,112 @@ function rayCollide(angle) {
 
 function rayCollideVertical(angle, m) {
   //X = (Y - py) / m + px
-  // if (angle >= 0 && angle < PI / 2) {
-  // } else if (angle < )
+  let X = 0;
+  if (angle >= 0 && angle < PI / 2) {
+    for (
+      let yCollideHeight = Math.floor(playerY / BLOCK_SIZE) * BLOCK_SIZE;
+      yCollideHeight > 0;
+      yCollideHeight -= BLOCK_SIZE
+    ) {
+      X = (yCollideHeight - playerY) / m + playerX;
+      if (
+        map[
+          (Math.round(yCollideHeight / BLOCK_SIZE) - 1) * mapHorizontalBlocks +
+            Math.floor(X / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: X,
+          y: yCollideHeight,
+          length: hypotenuseCalculate(X - playerX, 0 - playerY),
+        };
+      }
+    }
+    X = (0 - playerY) / m + playerX;
+    return {
+      x: X,
+      y: 0,
+      length: hypotenuseCalculate(X - playerX, 0 - playerY),
+    };
+  } else if (angle < PI) {
+    for (
+      let yCollideHeight = Math.floor(playerY / BLOCK_SIZE) * BLOCK_SIZE;
+      yCollideHeight > 0;
+      yCollideHeight -= BLOCK_SIZE
+    ) {
+      X = (yCollideHeight - playerY) / m + playerX;
+      if (
+        map[
+          (Math.floor(yCollideHeight / BLOCK_SIZE) - 1) * mapHorizontalBlocks +
+            Math.floor(X / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: X,
+          y: yCollideHeight,
+          length: hypotenuseCalculate(X - playerX, yCollideHeight - playerY),
+        };
+      }
+    }
+    X = (0 - playerY) / m + playerX;
+    return {
+      x: X,
+      y: 0,
+      length: hypotenuseCalculate(X - playerX, 0 - playerY),
+    };
+  } else if (angle < (PI * 3) / 2) {
+    for (
+      let yCollideHeight = Math.ceil(playerY / BLOCK_SIZE) * BLOCK_SIZE;
+      yCollideHeight < C1HEIGHT;
+      yCollideHeight += BLOCK_SIZE
+    ) {
+      X = (yCollideHeight - playerY) / m + playerX;
+      if (
+        map[
+          Math.ceil(yCollideHeight / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.floor(X / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: X,
+          y: yCollideHeight,
+          length: hypotenuseCalculate(X - playerX, yCollideHeight - playerY),
+        };
+      }
+    }
+    X = (C1HEIGHT - playerY) / m + playerX;
+    return {
+      x: X,
+      y: C1HEIGHT,
+      length: hypotenuseCalculate(X - playerX, C1HEIGHT - playerY),
+    };
+  } else {
+    for (
+      let yCollideHeight = Math.ceil(playerY / BLOCK_SIZE) * BLOCK_SIZE;
+      yCollideHeight < C1HEIGHT;
+      yCollideHeight += BLOCK_SIZE
+    ) {
+      X = (yCollideHeight - playerY) / m + playerX;
+      if (
+        map[
+          Math.ceil(yCollideHeight / BLOCK_SIZE) * mapHorizontalBlocks +
+            Math.floor(X / BLOCK_SIZE)
+        ] === 0
+      ) {
+        return {
+          x: X,
+          y: yCollideHeight,
+          length: hypotenuseCalculate(X - playerX, yCollideHeight - playerY),
+        };
+      }
+    }
+    X = (C1HEIGHT - playerY) / m + playerX;
+    return {
+      x: X,
+      y: C1HEIGHT,
+      length: hypotenuseCalculate(X - playerX, C1HEIGHT - playerY),
+    };
+  }
 }
 
 function rayCollideHorizontal(angle, m) {
