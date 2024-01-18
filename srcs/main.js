@@ -1,14 +1,9 @@
-import { minimapInit, minimapDraw } from "./minimap.js";
+import { minimapInit, minimapDraw, leftCanvas, minimap } from "./minimap.js";
 import { playerInit, playerDraw, laserDraw, lightDraw } from "./player.js";
+import { rightCanvas, gameplay } from "./raycast.js";
 
 const PI = Math.PI.toFixed(8);
 const ANIMATION_TICK = 1 / 60;
-
-const rightCanvas = document.getElementById("gameplay");
-const gameplay = rightCanvas.getContext("2d");
-
-const leftCanvas = document.getElementById("minimap");
-const minimap = leftCanvas.getContext("2d");
 
 minimapInit();
 minimapDraw();
