@@ -24,8 +24,8 @@ function gameLoop() {
 
   minimapDraw();
   playerDraw();
-  laserDraw();
   lightDraw();
+  laserDraw();
 
   setTimeout(gameLoop, ANIMATION_TICK);
 }

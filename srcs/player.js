@@ -29,6 +29,7 @@ export function playerInit() {
   playerY = Math.floor(C1HEIGHT / 2);
 }
 
+//draw player in the minimap as a red dot
 export function playerDraw() {
   minimap.fillStyle = "red";
   minimap.beginPath();
@@ -36,6 +37,7 @@ export function playerDraw() {
   minimap.fill();
 }
 
+//draw player's direction in the minimap as a red line
 export function laserDraw() {
   const laserStartX = playerX;
   const laserStartY = playerY;
@@ -56,15 +58,17 @@ export function laserDraw() {
   minimap.stroke();
 }
 
+//draw player's sight(light) in the minimap as green lines
 export function lightDraw() {
   const lightStartX = playerX;
   const lightStartY = playerY;
 
   const HALF_SIGHT = (PI / 6).toFixed(8);
-  //temp code
+  //temp code - it will draw circle around the player
   // const laserLength = leftCanvas.width * leftCanvas.height; //DEFAULT_VALUE
 
   for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.05) {
+    //temp code - it will draw circle around the player
     // const obj = quadrantCalculate(playerAngle + rayAngle);
     // const rayX = obj.X;
     // const rayY = obj.Y;
@@ -76,6 +80,7 @@ export function lightDraw() {
     minimap.strokeStyle = "green";
     minimap.beginPath();
     minimap.moveTo(lightStartX, lightStartY);
+    //temp code - it will draw circle around the player
     // minimap.lineTo(
     //   lightStartX + laserLength * rayX,
     //   lightStartY + laserLength * rayY
@@ -86,6 +91,7 @@ export function lightDraw() {
   }
 }
 
+//check if the light collides with the wall
 function rayCollide(angle) {
   while (angle < 0) {
     angle += 2 * PI;
@@ -118,6 +124,8 @@ function rayCollide(angle) {
   return obj;
 }
 
+//check if the light collides with a wall vertically
+//we don't need to think about when the value of m is infinite.
 function rayCollideVertical(angle, m) {
   //X = (Y - py) / m + px
   let X = 0;
@@ -228,6 +236,8 @@ function rayCollideVertical(angle, m) {
   }
 }
 
+//check if the light collides with a wall horizontally
+//we have to manage the case when the value of m is 0.
 function rayCollideHorizontal(angle, m) {
   //Y = m(X - pX) + pY
   let Y = 0;

@@ -3,14 +3,15 @@
 export const leftCanvas = document.getElementById("minimap");
 export const minimap = leftCanvas.getContext("2d");
 
-export const C1WIDTH = leftCanvas.width;
-export const C1HEIGHT = leftCanvas.height;
+export const C1WIDTH = leftCanvas.width; //real canvas width
+export const C1HEIGHT = leftCanvas.height; //real canvas height
 
 export let map = [];
-export let mapHorizontalBlocks = 0; //가로 칸 수
-export let mapVerticalBlocks = 0; //세로 칸 수
-export const BLOCK_SIZE = 30; //한칸의 길이
+export let mapHorizontalBlocks = 0; //가로 칸 수 - canvas horizontal blocks
+export let mapVerticalBlocks = 0; //세로 칸 수 - canvas vertical blocks
+export const BLOCK_SIZE = 30; //한칸의 길이 - real size(= width, height) of one block
 
+//setting map array : 1 = white(empty field), 0 = black(wall)
 export function minimapInit() {
   const h = Math.floor(C1HEIGHT / BLOCK_SIZE);
   const w = Math.floor(C1WIDTH / BLOCK_SIZE);
@@ -27,6 +28,7 @@ export function minimapInit() {
   mapVerticalBlocks = h;
 }
 
+//draw left-side minimap randomly
 export function minimapDraw() {
   minimap.fillStyle = "grey";
   minimap.fillRect(0, 0, C1WIDTH, C1HEIGHT);
