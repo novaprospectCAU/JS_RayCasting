@@ -65,7 +65,7 @@ export function lightDraw() {
   // const laserLength = leftCanvas.width * leftCanvas.height; //DEFAULT_VALUE
 
   let number = 0;
-  for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.02) {
+  for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.005) {
     //temp code - it will draw circle around the player
     // const obj = quadrantCalculate(playerAngle + rayAngle);
     // const rayX = obj.X;

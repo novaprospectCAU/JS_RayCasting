@@ -9,7 +9,7 @@ export const C1HEIGHT = leftCanvas.height; //real canvas height
 export let map = [];
 export let mapHorizontalBlocks = 0; //가로 칸 수 - canvas horizontal blocks
 export let mapVerticalBlocks = 0; //세로 칸 수 - canvas vertical blocks
-export const BLOCK_SIZE = 30; //한칸의 길이 - real size(= width, height) of one block
+export const BLOCK_SIZE = 10; //한칸의 길이 - real size(= width, height) of one block
 
 //setting map array : 1 = white(empty field), 0 = black(wall)
 export function minimapInit() {
@@ -36,10 +36,10 @@ export function minimapDraw() {
     for (let x = 0; x < mapHorizontalBlocks; x++) {
       if (map[y * mapHorizontalBlocks + x] === 1) {
         minimap.fillStyle = "white";
-        minimap.fillRect(x * BLOCK_SIZE + 0.5, y * BLOCK_SIZE + 0.5, 29, 29);
+        minimap.fillRect(x * BLOCK_SIZE + 0.5, y * BLOCK_SIZE + 0.5, 9, 9);
       } else {
         minimap.fillStyle = "black";
-        minimap.fillRect(x * BLOCK_SIZE + 0.5, y * BLOCK_SIZE + 0.5, 29, 29);
+        minimap.fillRect(x * BLOCK_SIZE + 0.5, y * BLOCK_SIZE + 0.5, 9, 9);
       }
     }
   }
