@@ -413,19 +413,62 @@ document.addEventListener("keydown", (e) => {
     playerAngle -= PI / 30;
   } else if (e.key === 38 || e.key === "ArrowUp") {
     moveUp = true;
-    xMove = Math.cos(playerAngle) * 2;
-    yMove = -Math.sin(playerAngle) * 2;
-    playerX += xMove;
-    playerY += yMove;
+    if (!playerCollide("up")) {
+      xMove = Math.cos(playerAngle) * 2;
+      yMove = -Math.sin(playerAngle) * 2;
+      playerX += xMove;
+      playerY += yMove;
+    }
   } else if (e.key === 39 || e.key === "ArrowLeft") {
     moveLeft = true;
     playerAngle += PI / 30;
   } else if (e.key === 40 || e.key === "ArrowDown") {
     moveDown = true;
-    xMove = Math.cos(playerAngle - PI) * 2;
-    yMove = -Math.sin(playerAngle - PI) * 2;
-    playerX += xMove;
-    playerY += yMove;
+    if (!playerCollide("down")) {
+      xMove = Math.cos(playerAngle - PI) * 2;
+      yMove = -Math.sin(playerAngle - PI) * 2;
+      playerX += xMove;
+      playerY += yMove;
+    }
   } else {
   }
 });
+
+//check if the player is about to collide with a wall while moving
+function playerCollide(direction) {
+  //CurrentBlock : player's block
+  const xCurrentBlock = Math.floor(playerX / BLOCK_SIZE);
+  const yCurrentBlock = Math.floor(playerY / BLOCK_SIZE);
+
+  let xVector = 0;
+  let yVector = 0;
+  if (direction === "up") {
+    xVector = Math.cos(playerAngle) * 6;
+    yVector = -Math.sin(playerAngle) * 6;
+  } else {
+    xVector = Math.cos(playerAngle - PI) * 6;
+    yVector = -Math.sin(playerAngle - PI) * 6;
+  }
+  //DirectionBlock : future block
+  const xDirectionBlock = Math.floor((playerX + xVector) / BLOCK_SIZE);
+  const yDirectionBlock = Math.floor((playerY + yVector) / BLOCK_SIZE);
+  //1. check if the x-direction block is a wall
+  if (xCurrentBlock !== xDirectionBlock) {
+    if (map[yDirectionBlock * mapHorizontalBlocks + xDirectionBlock] === 0) {
+      return true;
+    }
+  }
+  //2. check if the y-direction block is a wall
+  if (yCurrentBlock !== yDirectionBlock) {
+    if (map[yDirectionBlock * mapHorizontalBlocks + xDirectionBlock] === 0) {
+      return true;
+    }
+  }
+  //3. check if the (x, y)-direction block is a wall
+  if (xCurrentBlock !== xDirectionBlock && yCurrentBlock !== yDirectionBlock) {
+    if (map[yDirectionBlock * mapHorizontalBlocks + xDirectionBlock] === 0) {
+      return true;
+    }
+  }
+  return false;
+}
