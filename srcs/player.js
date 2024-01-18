@@ -9,6 +9,8 @@ import {
   BLOCK_SIZE,
 } from "./minimap.js";
 
+import { raycastDraw } from "./raycast.js";
+
 import { quadrantCalculate, hypotenuseCalculate } from "./util.js";
 
 const PI = Math.PI.toFixed(8);
@@ -62,7 +64,8 @@ export function lightDraw() {
   //temp code - it will draw circle around the player
   // const laserLength = leftCanvas.width * leftCanvas.height; //DEFAULT_VALUE
 
-  for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.05) {
+  let number = 0;
+  for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.02) {
     //temp code - it will draw circle around the player
     // const obj = quadrantCalculate(playerAngle + rayAngle);
     // const rayX = obj.X;
@@ -71,6 +74,11 @@ export function lightDraw() {
     const obj = rayCollide(playerAngle + rayAngle);
     const rayX = obj.x;
     const rayY = obj.y;
+    const rayLength = obj.length;
+
+    raycastDraw(number, rayLength);
+    number++;
+    console.log(number);
 
     minimap.strokeStyle = "green";
     minimap.beginPath();
