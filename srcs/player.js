@@ -19,11 +19,6 @@ export let playerY = 0;
 
 export let playerAngle = PI * 0.5;
 
-export let moveRight = false;
-export let moveLeft = false;
-export let moveUp = false;
-export let moveDown = false;
-
 export function playerInit() {
   playerX = Math.floor(C1WIDTH / 2) + Math.floor(BLOCK_SIZE / 2);
   playerY = Math.floor(C1HEIGHT / 2);
@@ -409,10 +404,8 @@ document.addEventListener("keydown", (e) => {
   let yMove = 0;
 
   if (e.key === 37 || e.key === "ArrowRight") {
-    moveRight = true;
     playerAngle -= PI / 30;
   } else if (e.key === 38 || e.key === "ArrowUp") {
-    moveUp = true;
     if (!playerCollide("up")) {
       xMove = Math.cos(playerAngle) * 2;
       yMove = -Math.sin(playerAngle) * 2;
@@ -420,10 +413,8 @@ document.addEventListener("keydown", (e) => {
       playerY += yMove;
     }
   } else if (e.key === 39 || e.key === "ArrowLeft") {
-    moveLeft = true;
     playerAngle += PI / 30;
   } else if (e.key === 40 || e.key === "ArrowDown") {
-    moveDown = true;
     if (!playerCollide("down")) {
       xMove = Math.cos(playerAngle - PI) * 2;
       yMove = -Math.sin(playerAngle - PI) * 2;
