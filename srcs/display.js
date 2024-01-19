@@ -57,10 +57,14 @@ export function gunFire(animationNumber) {
     if (gunFireTick === 0) {
       gunFireTick = 15;
     }
+    let gunRecoilVal = Math.ceil(gunFireTick / 5);
+    if (gunRecoilVal === 1 || gunRecoilVal === 3) {
+      gunRecoilVal = 1;
+    }
     gameplay.drawImage(
       gunImgArr[Math.ceil(gunFireTick / 5)],
-      C2WIDTH / 2,
-      0,
+      C2WIDTH / 2 + gunRecoilVal * 5,
+      gunRecoilVal * 5,
       200,
       200
     );

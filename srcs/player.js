@@ -453,6 +453,8 @@ document.addEventListener("keydown", (e) => {
         futureOnHand = 2;
       }
     }
+  } else if (e.key === "Space Bar" || e.key === " ") {
+    toggleFlag();
   }
 });
 
