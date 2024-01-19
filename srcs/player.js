@@ -9,9 +9,11 @@ import {
   BLOCK_SIZE,
 } from "./minimap.js";
 
-import { raycastDraw } from "./raycast.js";
+import { raycastDraw, rightCanvas } from "./raycast.js";
 
 import { quadrantCalculate, hypotenuseCalculate } from "./util.js";
+
+import { toggleFlag } from "./display.js";
 
 const PI = Math.PI.toFixed(8);
 
@@ -20,6 +22,11 @@ export let playerX = 0;
 export let playerY = 0;
 
 export let playerAngle = PI * 0.5;
+
+export let handMoving = false;
+export let onHand = 1;
+export let futureOnHand = 1;
+export let drawingTick = 0; //animation tick for drawing stuffs
 
 export function playerInit() {
   playerX = Math.floor(C1WIDTH / 2) + Math.floor(BLOCK_SIZE / 2);
@@ -405,7 +412,11 @@ function rayCollideHorizontal(angle, m) {
   }
 }
 
-//입력받고 이동까지는 구현했으나 충돌은 구현하지 않았음
+// handMoving = false;
+// onHand = 1;
+// futureOnHand = 2;
+// drawingTick = 0;
+//입력받고 이동까지 구현
 document.addEventListener("keydown", (e) => {
   let xMove = 0;
   let yMove = 0;
@@ -428,7 +439,20 @@ document.addEventListener("keydown", (e) => {
       playerX += xMove;
       playerY += yMove;
     }
-  } else {
+  } else if (e.key === 49 || e.key === "1") {
+    if (!handMoving) {
+      if (onHand === 2) {
+        drawingTick = 100;
+        futureOnHand = 1;
+      }
+    }
+  } else if (e.key === 50 || e.key === "2") {
+    if (!handMoving) {
+      if (onHand === 1) {
+        drawingTick = 100;
+        futureOnHand = 2;
+      }
+    }
   }
 });
 
@@ -470,3 +494,7 @@ function playerCollide(direction) {
   }
   return false;
 }
+
+rightCanvas.addEventListener("mousedown", (e) => {
+  toggleFlag();
+});
