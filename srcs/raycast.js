@@ -16,9 +16,9 @@ export const C2RAYS = 210;
 
 export function gameplayBackgroundDraw() {
   //background
-  gameplay.fillStyle = `rgb(48,48,48)`;
+  gameplay.fillStyle = `rgb(0,0,0)`; //floor
   gameplay.fillRect(0, C2HEIGHT / 2, C2WIDTH, C2HEIGHT / 2);
-  gameplay.fillStyle = `rgb(128,128,128)`;
+  gameplay.fillStyle = `rgb(24,24,24)`; //ceil
   gameplay.fillRect(0, 0, C2WIDTH, C2HEIGHT / 2);
 }
 
@@ -38,17 +38,23 @@ export function raycastDraw(number, distance) {
   );
 }
 
-function raycastColor(number, distance) {
-  let colorCode = [255, 0, 0];
-  if (distance < 255) {
-    colorCode[0] -= (distance * 3) / 4;
-    colorCode[1] += distance / 4;
-    colorCode[2] += distance / 4;
-  } else {
-    colorCode[0] = 64;
-    colorCode[1] = 64;
-    colorCode[2] = 64;
-  }
+//select color of wall width distance and the angle(in number)
+function raycastColor(number, distance, isEdge) {
+  let colorCode = [255, 0, 0]; //[[R,G,B]]
 
+  //color change by distance
+  if (distance < 255) {
+    colorCode[0] -= distance * 2;
+  } else {
+    colorCode[0] = 0;
+    colorCode[1] = 0;
+    colorCode[2] = 0;
+  }
+  //color change by lamp
+  if (number > C2RAYS / 2) {
+    colorCode[0] -= Math.floor((number - C2RAYS / 2) * 1.8);
+  } else {
+    colorCode[0] += Math.floor((C2RAYS / 2 - number) * 1.2);
+  }
   return colorCode;
 }
