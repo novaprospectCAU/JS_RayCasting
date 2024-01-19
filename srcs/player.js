@@ -78,7 +78,6 @@ export function lightDraw() {
 
     raycastDraw(number, rayLength);
     number++;
-    console.log(number);
 
     minimap.strokeStyle = "green";
     minimap.beginPath();
