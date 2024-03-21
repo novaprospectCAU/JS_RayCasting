@@ -18,7 +18,7 @@ export function gameplayBackgroundDraw() {
   //background
   gameplay.fillStyle = `rgb(0,0,0)`; //floor
   gameplay.fillRect(0, C2HEIGHT / 2, C2WIDTH, C2HEIGHT / 2);
-  gameplay.fillStyle = `rgb(24,24,24)`; //ceil
+  gameplay.fillStyle = `rgb(64,64,64)`; //ceil
   gameplay.fillRect(0, 0, C2WIDTH, C2HEIGHT / 2);
 }
 
