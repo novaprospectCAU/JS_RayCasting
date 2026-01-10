@@ -15,18 +15,23 @@ import { quadrantCalculate, hypotenuseCalculate } from "./util.js";
 
 import { toggleFlag } from "./display.js";
 
-const PI = Math.PI.toFixed(8);
+// ============ 상수 정의 ============
+const PI = Math.PI;
+const TWO_PI = PI * 2;
 
-//real position of player in Minimap
+// 플레이어 설정
+const PLAYER_MOVE_SPEED = 2;
+const PLAYER_ROTATE_SPEED = PI / 30;
+const COLLISION_CHECK_DISTANCE = 6;
+
+// 시야 설정
+const HALF_FOV = PI / 6; // 시야각의 절반 (30도)
+const RAY_ANGLE_STEP = 0.005;
+
+// ============ 플레이어 상태 ============
 export let playerX = 0;
 export let playerY = 0;
-
 export let playerAngle = PI * 0.5;
-
-export let handMoving = false;
-export let onHand = 1;
-export let futureOnHand = 1;
-export let drawingTick = 0; //animation tick for drawing stuffs
 
 export function playerInit() {
   playerX = Math.floor(C1WIDTH / 2) + Math.floor(BLOCK_SIZE / 2);
@@ -62,55 +67,41 @@ export function laserDraw() {
   minimap.stroke();
 }
 
-//draw player's sight(light) in the minimap as green lines
+/**
+ * 플레이어 시야(광선)를 미니맵에 녹색 선으로 그림
+ */
 export function lightDraw() {
   const lightStartX = playerX;
   const lightStartY = playerY;
 
-  const HALF_SIGHT = (PI / 6).toFixed(8);
-  //temp code - it will draw circle around the player
-  // const laserLength = leftCanvas.width * leftCanvas.height; //DEFAULT_VALUE
+  let rayIndex = 0;
+  for (
+    let rayAngle = -HALF_FOV;
+    rayAngle <= HALF_FOV;
+    rayAngle += RAY_ANGLE_STEP
+  ) {
+    const hitResult = rayCollide(playerAngle + rayAngle);
+    const { x: rayX, y: rayY, length: rayLength } = hitResult;
 
-  let number = 0;
-  for (let rayAngle = -HALF_SIGHT; rayAngle <= HALF_SIGHT; rayAngle += 0.005) {
-    //temp code - it will draw circle around the player
-    // const obj = quadrantCalculate(playerAngle + rayAngle);
-    // const rayX = obj.X;
-    // const rayY = obj.Y;
+    raycastDraw(rayIndex, rayLength);
+    rayIndex++;
 
-    const obj = rayCollide(playerAngle + rayAngle);
-    const rayX = obj.x;
-    const rayY = obj.y;
-    const rayLength = obj.length;
-
-    raycastDraw(number, rayLength);
-    number++;
-
+    // 미니맵에 광선 그리기
     minimap.strokeStyle = "green";
     minimap.beginPath();
     minimap.moveTo(lightStartX, lightStartY);
-    //temp code - it will draw circle around the player
-    // minimap.lineTo(
-    //   lightStartX + laserLength * rayX,
-    //   lightStartY + laserLength * rayY
-    // );
     minimap.lineTo(rayX, rayY);
     minimap.closePath();
     minimap.stroke();
   }
 }
 
-//check if the light collides with the wall
+/**
+ * 광선이 벽과 충돌하는 지점을 계산
+ */
 function rayCollide(angle) {
-  while (angle < 0) {
-    angle += 2 * PI;
-  }
-  while (angle > 2 * PI) {
-    angle %= 2 * PI;
-  }
-  if (angle === 2 * PI) {
-    angle = 0;
-  }
+  // 각도 정규화 (0 ~ 2PI)
+  angle = ((angle % TWO_PI) + TWO_PI) % TWO_PI;
   let m = Math.tan(angle);
   if (m > 0) {
     if (m < 0.001) {
@@ -412,91 +403,79 @@ function rayCollideHorizontal(angle, m) {
   }
 }
 
-// handMoving = false;
-// onHand = 1;
-// futureOnHand = 2;
-// drawingTick = 0;
-//입력받고 이동까지 구현
-document.addEventListener("keydown", (e) => {
-  let xMove = 0;
-  let yMove = 0;
+// ============ 입력 처리 ============
 
-  if (e.key === 37 || e.key === "ArrowRight") {
-    playerAngle -= PI / 30;
-  } else if (e.key === 38 || e.key === "ArrowUp") {
-    if (!playerCollide("up")) {
-      xMove = Math.cos(playerAngle) * 2;
-      yMove = -Math.sin(playerAngle) * 2;
-      playerX += xMove;
-      playerY += yMove;
-    }
-  } else if (e.key === 39 || e.key === "ArrowLeft") {
-    playerAngle += PI / 30;
-  } else if (e.key === 40 || e.key === "ArrowDown") {
-    if (!playerCollide("down")) {
-      xMove = Math.cos(playerAngle - PI) * 2;
-      yMove = -Math.sin(playerAngle - PI) * 2;
-      playerX += xMove;
-      playerY += yMove;
-    }
-  } else if (e.key === 49 || e.key === "1") {
-    if (!handMoving) {
-      if (onHand === 2) {
-        drawingTick = 100;
-        futureOnHand = 1;
+/**
+ * 키보드 입력 핸들러
+ */
+function handleKeyDown(e) {
+  switch (e.key) {
+    case "ArrowRight":
+      playerAngle -= PLAYER_ROTATE_SPEED;
+      break;
+    case "ArrowLeft":
+      playerAngle += PLAYER_ROTATE_SPEED;
+      break;
+    case "ArrowUp":
+      if (!playerCollide("up")) {
+        playerX += Math.cos(playerAngle) * PLAYER_MOVE_SPEED;
+        playerY -= Math.sin(playerAngle) * PLAYER_MOVE_SPEED;
       }
-    }
-  } else if (e.key === 50 || e.key === "2") {
-    if (!handMoving) {
-      if (onHand === 1) {
-        drawingTick = 100;
-        futureOnHand = 2;
+      break;
+    case "ArrowDown":
+      if (!playerCollide("down")) {
+        playerX += Math.cos(playerAngle - PI) * PLAYER_MOVE_SPEED;
+        playerY -= Math.sin(playerAngle - PI) * PLAYER_MOVE_SPEED;
       }
-    }
-  } else if (e.key === "Space Bar" || e.key === " ") {
-    toggleFlag();
+      break;
+    case " ": // Space bar
+      toggleFlag();
+      break;
   }
-});
+}
 
-//check if the player is about to collide with a wall while moving
+/**
+ * 마우스 클릭 핸들러
+ */
+function handleMouseDown() {
+  toggleFlag();
+}
+
+// 이벤트 리스너 등록
+document.addEventListener("keydown", handleKeyDown);
+rightCanvas.addEventListener("mousedown", handleMouseDown);
+
+/**
+ * 이벤트 리스너 정리 함수 (React 전환 시 필요)
+ */
+export function cleanupPlayerEvents() {
+  document.removeEventListener("keydown", handleKeyDown);
+  rightCanvas.removeEventListener("mousedown", handleMouseDown);
+}
+
+/**
+ * 플레이어가 벽과 충돌하는지 확인
+ */
 function playerCollide(direction) {
-  //CurrentBlock : player's block
   const xCurrentBlock = Math.floor(playerX / BLOCK_SIZE);
   const yCurrentBlock = Math.floor(playerY / BLOCK_SIZE);
 
-  let xVector = 0;
-  let yVector = 0;
-  if (direction === "up") {
-    xVector = Math.cos(playerAngle) * 6;
-    yVector = -Math.sin(playerAngle) * 6;
-  } else {
-    xVector = Math.cos(playerAngle - PI) * 6;
-    yVector = -Math.sin(playerAngle - PI) * 6;
-  }
-  //DirectionBlock : future block
+  // 이동 방향에 따른 벡터 계산
+  const angle = direction === "up" ? playerAngle : playerAngle - PI;
+  const xVector = Math.cos(angle) * COLLISION_CHECK_DISTANCE;
+  const yVector = -Math.sin(angle) * COLLISION_CHECK_DISTANCE;
+
+  // 예상 위치의 블록 좌표
   const xDirectionBlock = Math.floor((playerX + xVector) / BLOCK_SIZE);
   const yDirectionBlock = Math.floor((playerY + yVector) / BLOCK_SIZE);
-  //1. check if the x-direction block is a wall
-  if (xCurrentBlock !== xDirectionBlock) {
-    if (map[yDirectionBlock * mapHorizontalBlocks + xDirectionBlock] === 0) {
+
+  // 블록이 변경되면 충돌 검사
+  if (xCurrentBlock !== xDirectionBlock || yCurrentBlock !== yDirectionBlock) {
+    const mapIndex = yDirectionBlock * mapHorizontalBlocks + xDirectionBlock;
+    if (map[mapIndex] === 0) {
       return true;
     }
   }
-  //2. check if the y-direction block is a wall
-  if (yCurrentBlock !== yDirectionBlock) {
-    if (map[yDirectionBlock * mapHorizontalBlocks + xDirectionBlock] === 0) {
-      return true;
-    }
-  }
-  //3. check if the (x, y)-direction block is a wall
-  if (xCurrentBlock !== xDirectionBlock && yCurrentBlock !== yDirectionBlock) {
-    if (map[yDirectionBlock * mapHorizontalBlocks + xDirectionBlock] === 0) {
-      return true;
-    }
-  }
+
   return false;
 }
-
-rightCanvas.addEventListener("mousedown", (e) => {
-  toggleFlag();
-});

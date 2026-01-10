@@ -1,60 +1,81 @@
-import { playerX, playerY, playerAngle } from "./player.js";
-import { minimap, C1WIDTH, C1HEIGHT } from "./minimap.js";
 import { wallHeightCalculate } from "./util.js";
 
-//shader - optional
+// 셰이더 (선택사항)
 import { colorMix } from "./display.js";
 
+// ============ 캔버스 설정 ============
 export const rightCanvas = document.getElementById("gameplay");
 export const gameplay = rightCanvas.getContext("2d");
 
 export const C2WIDTH = rightCanvas.width;
 export const C2HEIGHT = rightCanvas.height;
 export const WALLHEIGHT = (rightCanvas.height * 3) / 4;
-export const C2BLOCKWIDTH = C2WIDTH / 209; // there are 210 rays
-export const C2RAYS = 210;
 
+// 광선 설정
+export const C2RAYS = 210;
+export const C2BLOCKWIDTH = C2WIDTH / (C2RAYS - 1);
+
+// 색상 설정
+const FLOOR_COLOR = "rgb(0, 0, 0)";
+const CEILING_COLOR = "rgb(64, 64, 64)";
+const BASE_WALL_COLOR = 255; // 빨간색 기준
+
+/**
+ * 배경 (바닥 + 천장) 그리기
+ */
 export function gameplayBackgroundDraw() {
-  //background
-  gameplay.fillStyle = `rgb(0,0,0)`; //floor
-  gameplay.fillRect(0, C2HEIGHT / 2, C2WIDTH, C2HEIGHT / 2);
-  gameplay.fillStyle = `rgb(64,64,64)`; //ceil
-  gameplay.fillRect(0, 0, C2WIDTH, C2HEIGHT / 2);
+  const halfHeight = C2HEIGHT / 2;
+
+  gameplay.fillStyle = FLOOR_COLOR;
+  gameplay.fillRect(0, halfHeight, C2WIDTH, halfHeight);
+
+  gameplay.fillStyle = CEILING_COLOR;
+  gameplay.fillRect(0, 0, C2WIDTH, halfHeight);
 }
 
-export function raycastDraw(number, distance) {
+/**
+ * 광선 기반 벽 그리기
+ */
+export function raycastDraw(rayIndex, distance) {
   const height = wallHeightCalculate(WALLHEIGHT, distance);
-  const RGB = raycastColor(number, distance);
+  const color = calculateWallColor(rayIndex, distance);
 
-  //You can change color / theme / shader under the comment
-  // colorMix(number, RGB);
+  // 셰이더 적용 (선택사항)
+  // colorMix(rayIndex, color);
 
-  gameplay.fillStyle = `rgb(${RGB[0]},${RGB[1]},${RGB[2]})`;
+  gameplay.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
   gameplay.fillRect(
-    C2WIDTH - number * C2BLOCKWIDTH,
+    C2WIDTH - rayIndex * C2BLOCKWIDTH,
     C2HEIGHT / 2 - height,
     C2BLOCKWIDTH,
     height * 2
   );
 }
 
-//select color of wall width distance and the angle(in number)
-function raycastColor(number, distance, isEdge) {
-  let colorCode = [255, 0, 0]; //[[R,G,B]]
+/**
+ * 거리와 광선 인덱스에 따른 벽 색상 계산
+ */
+function calculateWallColor(rayIndex, distance) {
+  const color = [BASE_WALL_COLOR, 0, 0]; // [R, G, B]
+  const halfRays = C2RAYS / 2;
 
-  //color change by distance
+  // 거리에 따른 어두워짐
   if (distance < 255) {
-    colorCode[0] -= distance * 2;
+    color[0] -= distance * 2;
   } else {
-    colorCode[0] = 0;
-    colorCode[1] = 0;
-    colorCode[2] = 0;
+    // 너무 멀면 완전히 어둡게
+    return [0, 0, 0];
   }
-  //color change by lamp
-  if (number > C2RAYS / 2) {
-    colorCode[0] -= Math.floor((number - C2RAYS / 2) * 1.8);
+
+  // 램프(화면 중앙) 기준 조명 효과
+  if (rayIndex > halfRays) {
+    color[0] -= Math.floor((rayIndex - halfRays) * 1.8);
   } else {
-    colorCode[0] += Math.floor((C2RAYS / 2 - number) * 1.2);
+    color[0] += Math.floor((halfRays - rayIndex) * 1.2);
   }
-  return colorCode;
+
+  // 색상 값 클램핑 (0-255)
+  color[0] = Math.max(0, Math.min(255, color[0]));
+
+  return color;
 }

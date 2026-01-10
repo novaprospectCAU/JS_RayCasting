@@ -8,75 +8,100 @@ import {
   C2RAYS,
 } from "./raycast.js";
 
-const PI = Math.PI.toFixed(8);
+// ============ 상수 정의 ============
+const GUN_SIZE = 200;
+const GUN_RECOIL_DURATION = 15;
+const GUN_RECOIL_MULTIPLIER = 5;
 
+// ============ 이미지 리소스 ============
 const lampImg = new Image();
 lampImg.src = "./../assets/lamp.png";
 
-const gunImgArr = [];
-gunImgArr[0] = new Image();
-gunImgArr[0].src = "./../assets/ak.png";
-gunImgArr[1] = new Image();
-gunImgArr[1].src = "./../assets/ak2.png";
-gunImgArr[2] = new Image();
-gunImgArr[2].src = "./../assets/ak3.png";
-gunImgArr[3] = new Image();
-gunImgArr[3].src = "./../assets/ak.png";
+// 총 이미지 배열 (더 간결한 초기화)
+const GUN_IMAGE_SOURCES = [
+  "./../assets/ak.png",
+  "./../assets/ak2.png",
+  "./../assets/ak3.png",
+  "./../assets/ak.png", // 마지막 프레임은 첫 번째와 동일
+];
+const gunImgArr = GUN_IMAGE_SOURCES.map((src) => {
+  const img = new Image();
+  img.src = src;
+  return img;
+});
 
-export let gunFireFlag = false;
+// ============ 상태 ============
+let gunFireFlag = false;
 let gunFireTick = 0;
 
+/**
+ * 색상 혼합 효과 (셰이더용)
+ */
 export function colorMix(number, RGB) {
-  if (number === C2RAYS / 2) return;
-  if (number < C2RAYS / 2) {
-    RGB[0] -= 2 * (C2RAYS / 2 - number);
-    RGB[1] += 2 * (C2RAYS / 2 - number);
-    RGB[2] += 2 * (C2RAYS / 2 - number);
-  } else {
+  const halfRays = C2RAYS / 2;
+  if (number === halfRays) return;
+
+  if (number < halfRays) {
+    const diff = 2 * (halfRays - number);
+    RGB[0] -= diff;
+    RGB[1] += diff;
+    RGB[2] += diff;
   }
+  // number > halfRays 케이스는 현재 미구현
 }
 
-export function lampDraw(animationNumber) {
-  //12 animation tick per one animation cycle
-
-  const angle1 = PI / 60;
-  const angle2 = PI / 30;
-  const angle3 = PI / 20;
-
-  gameplay.drawImage(lampImg, (C2WIDTH * 1.3) / 4 + 10, 0, 200, 200);
+/**
+ * 램프 그리기
+ */
+export function lampDraw() {
+  gameplay.drawImage(lampImg, (C2WIDTH * 1.3) / 4 + 10, 0, GUN_SIZE, GUN_SIZE);
 }
 
-export function gunDraw(animationNumber) {
-  if (gunFire(animationNumber) === "none") {
-    gameplay.drawImage(gunImgArr[0], C2WIDTH / 2, 0, 200, 200);
-  }
-}
-
-export function gunFire(animationNumber) {
+/**
+ * 총 그리기 (발사 애니메이션 포함)
+ */
+export function gunDraw() {
   if (gunFireFlag) {
-    if (gunFireTick === 0) {
-      gunFireTick = 15;
-    }
-    let gunRecoilVal = Math.ceil(gunFireTick / 5);
-    if (gunRecoilVal === 1 || gunRecoilVal === 3) {
-      gunRecoilVal = 1;
-    }
-    gameplay.drawImage(
-      gunImgArr[Math.ceil(gunFireTick / 5)],
-      C2WIDTH / 2 + gunRecoilVal * 5,
-      gunRecoilVal * 5,
-      200,
-      200
-    );
-    gunFireTick--;
-    if (gunFireTick === 0) {
-      gunFireFlag = false;
-    }
-    return "fire";
+    drawGunFiring();
+  } else {
+    // 기본 상태
+    gameplay.drawImage(gunImgArr[0], C2WIDTH / 2, 0, GUN_SIZE, GUN_SIZE);
   }
-  return "none";
 }
 
+/**
+ * 총 발사 애니메이션 처리
+ */
+function drawGunFiring() {
+  if (gunFireTick === 0) {
+    gunFireTick = GUN_RECOIL_DURATION;
+  }
+
+  // 반동 계산 (1 또는 3일 때는 1로 통일)
+  let recoilFrame = Math.ceil(gunFireTick / 5);
+  if (recoilFrame === 1 || recoilFrame === 3) {
+    recoilFrame = 1;
+  }
+
+  const recoilOffset = recoilFrame * GUN_RECOIL_MULTIPLIER;
+
+  gameplay.drawImage(
+    gunImgArr[Math.ceil(gunFireTick / 5)],
+    C2WIDTH / 2 + recoilOffset,
+    recoilOffset,
+    GUN_SIZE,
+    GUN_SIZE
+  );
+
+  gunFireTick--;
+  if (gunFireTick === 0) {
+    gunFireFlag = false;
+  }
+}
+
+/**
+ * 발사 상태 토글
+ */
 export function toggleFlag() {
   gunFireFlag = !gunFireFlag;
 }
