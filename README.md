@@ -1,5 +1,7 @@
 # JS_RayCasting
 
+<img width="1354" height="462" alt="image" src="https://github.com/user-attachments/assets/f9c2330b-60f4-4294-9019-924deccb2c65" />
+
 랜덤으로 맵을 생성하는 좌측 창과, 실제 플레이화면에 해당하는 우측 창이 분리되어 있습니다.
 
 먼저 이동은 키보드로 하며, 무기를 쏘는 것은 마우스 혹은 스페이스바를 통해 가능합니다.
